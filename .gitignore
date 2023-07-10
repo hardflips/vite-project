@@ -1,0 +1,12 @@
+node_modules
+.vscode
+public/bundle
+dist
+.idea
+.DS_Store
+.env.development
+.yarn
+.yarnrc.yml
+cypress/videos
+cypress/screenshots
+cypress/downloads
