@@ -21,7 +21,7 @@ const CardPage: React.FC = () => {
   };
 
   const renderLoading = () => {
-    return !photos ? <LinearProgress /> : null
+    return !photos && !error ? <LinearProgress /> : null
   }
 
   const renderPhotos = (photo: PhotoType) => {
@@ -37,8 +37,14 @@ const CardPage: React.FC = () => {
   }
 
   const renderCards = () => {
+    if (error) {
+      return <Alert severity="error">{error.message}</Alert>;
+    }
+    if (photos && photos.length === 0) {
+      return <Alert severity="warning">Nenhuma foto encontrada.</Alert>
+    }
     return (
-      <Grid container spacing={2} padding={2}>
+      <Grid container spacing={2} paddingBottom={2}>
         {photos ? photos.map((photo: PhotoType) => renderPhotos(photo)) : null}
       </Grid>
     )
@@ -66,14 +72,6 @@ const CardPage: React.FC = () => {
     )
   }
 
-  if (error) {
-    return <Alert severity="error">{error.message}</Alert>;
-  }
-
-  if (photos && photos.length === 0) {
-    return <Alert severity="warning">Nenhuma foto encontrada.</Alert>
-  }
-
   return <React.Fragment>
     <Helmet>
       <title>{RoutesNameEnum.CARDS}</title>
@@ -81,7 +79,7 @@ const CardPage: React.FC = () => {
     <Layout>
       {renderLoading()}
       {renderCards()}
-      {renderPagination()}; 
+      {renderPagination()}
     </Layout>
   </React.Fragment>;
 };

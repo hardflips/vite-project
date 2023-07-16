@@ -11,14 +11,14 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
     flex: '1 1 auto',
     flexDirection: 'column',
     maxWidth: '100%',
+    paddingTop: '16px',
+    paddingRight: '16px',
     [theme.breakpoints.up('lg')]: {
-      paddingLeft: SIDE_NAV_WIDTH
+      paddingLeft: SIDE_NAV_WIDTH + 16
     }
   }));
   
-  return <LayoutRoot>
-    {children}
-  </LayoutRoot>;
+  return <LayoutRoot>{children}</LayoutRoot>;
 };
 
 export default Layout;
