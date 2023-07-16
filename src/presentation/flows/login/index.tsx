@@ -1,141 +1,78 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import React, { useContext, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
+import { useCallback, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Snackbar, TextField, Typography } from '@mui/material';
-import * as yup from 'yup';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
-import { RoutesEnum, RoutesNameEnum } from '../../../routes/routePathsEnum';
-import { authenticate } from '../../../services/authenticateService';
 import { AuthContext } from '../../../contexts/AuthContext';
+import { authenticate } from '../../../services/authenticateService';
+import { RoutesEnum, RoutesNameEnum } from '../../../routes/routePathsEnum';
 
-import { Wrapper, FieldWrapper } from './styles';
-import { Field, FieldProps, Formik, FormikHelpers } from 'formik';
-
-interface FormValues {
-  email: string;
-  password: string;
-}
+import LoginLayout from './components/LoginLayout';
 
 const LoginPage: React.FC = () => {
   const { setToken } = useContext(AuthContext);
-  const [erroMessage, setErrorMessage] = useState<string>('');
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const navigate = useNavigate();
-
-  const validationSchema = yup.object().shape({
-    email: yup.string().email('Email inválido').required('Campo obrigatório'),
-    password: yup.string().required('Campo obrigatório'),
+  const [method, setMethod] = useState('email');
+  const [errorMessage, setErrorMessage] = useState<{ open: boolean; message: string}>({
+    open: false,
+    message: ''
   });
 
-  const handleSubmit = async (values: FormValues, actions: FormikHelpers<FormValues>) => {
-    console.log(values);
-    setErrorMessage('');
-    const { token, error } = await authenticate(values);
-    if (!error && token) {
-      setToken(token);
-      localStorage.setItem('userToken', token);
-      navigate(RoutesEnum.TABLE);
-    }
-    if (error) {
-      setErrorMessage(error?.message);
-      setOpenSnackBar(true);
-    }
-    actions.setSubmitting(false);
-  };
+  const navigate = useNavigate();
 
-  const renderError = () => {
-    return (
-      <Snackbar
-        open={openSnackBar}
-        autoHideDuration={4000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        onClose={() => {
-          setOpenSnackBar(false);
-        }}
-      >
-        <Alert severity="error" sx={{ width: '100%' }}>
-          {erroMessage}
-        </Alert>
-      </Snackbar>
-    )
-  }
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup
+        .string()
+        .email('Must be a valid email')
+        .max(255)
+        .required('Email is required'),
+      password: Yup
+        .string()
+        .max(255)
+        .required('Password is required')
+    }),
+    onSubmit: async (values) => {
+      const { token, error } = await authenticate(values);
+      if (token) {
+        setToken(token);
+        localStorage.setItem('userToken', token);
+        navigate(RoutesEnum.TABLE);
+      }
+      if (error) {
+        setErrorMessage({
+          open: true,
+          message: error.message,
+        });
+      }
+    }
+  });
 
-  const renderForm = () => {
-    return (
-      <Box
-        component="form"
-        noValidate
-        autoComplete="off"
-      >
-        <Wrapper>
-          <Typography variant='h5'>
-            Bem-vindo!
-          </Typography>
-          <Typography variant='subtitle2' component="small" paddingBottom={2}>
-            Insira seus dados abaixo:
-          </Typography>
-          <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ isValid, handleSubmit, errors, touched }) => (
-              <React.Fragment>
-                <Field name="email">
-                  {({ field }: FieldProps<FormValues['email']>) => (
-                    <FieldWrapper>
-                      <TextField
-                        {...field}
-                        label="Email"
-                        fullWidth
-                        error={touched.email && !!errors.email}
-                        helperText={touched.email && errors.email}
-                      />
-                    </FieldWrapper>
-                  )}
-                </Field>
-                <Field name="password">
-                  {({ field }: FieldProps<FormValues['password']>) => (
-                    <FieldWrapper>
-                      <TextField
-                        {...field}
-                        label="Senha"
-                        fullWidth
-                        type="password"
-                        error={touched.password && !!errors.password}
-                        helperText={touched.password && errors.password}
-                      />
-                    </FieldWrapper>
-                  )}
-                </Field>
-                <Button
-                  variant="contained"
-                  disabled={!isValid}
-                  color="primary"
-                  onClick={() => { void handleSubmit()}}
-                >
-                  Entrar
-                </Button>
-              </React.Fragment>
-            )}
-          </Formik>
-          <Typography variant='body1' component="small" sx={{marginTop: 2}}>
-            E-mail: eve.holt@reqres.in
-          </Typography>
-          {erroMessage ? renderError() : null}
-        </Wrapper>
-      </Box>
-    )
-  }
-  return <React.Fragment>
-    <Helmet>
-      <title>{RoutesNameEnum.LOGIN}</title>
-    </Helmet>
-    {renderForm()}
-  </React.Fragment>;
-};
+  const handleMethodChange = useCallback(
+    (_event: React.SyntheticEvent<Element>, value: string) => {
+      setMethod(value);
+    },
+    []
+  );
+  
+  return (
+    <LoginLayout
+      pageTitle={RoutesNameEnum.LOGIN}
+      method={method}
+      formik={formik}
+      handleMethodChange={handleMethodChange}
+      handleCloseSnackBar={() => {
+        setErrorMessage({
+          open: false,
+          message: '',
+        })
+      }}
+      errorMessage={errorMessage}
+    />
+  )
+}
 
 export default LoginPage;

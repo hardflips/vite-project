@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 import { Alert, Grid, LinearProgress, Pagination } from '@mui/material'
+import Layout from '../../components/Layout'
 import { RoutesNameEnum } from '../../../routes/routePathsEnum'
 import { usePhotosService } from '../../../services/usePhotosService'
 import { PhotoType } from '../../../services/usePhotosService/types'
@@ -35,9 +36,9 @@ const CardPage: React.FC = () => {
     )
   }
 
-  const renderAlbum = () => {
+  const renderCards = () => {
     return (
-      <Grid container spacing={2}>
+      <Grid container spacing={2} padding={2}>
         {photos ? photos.map((photo: PhotoType) => renderPhotos(photo)) : null}
       </Grid>
     )
@@ -77,9 +78,11 @@ const CardPage: React.FC = () => {
     <Helmet>
       <title>{RoutesNameEnum.CARDS}</title>
     </Helmet>
-    {renderLoading()}
-    {renderAlbum()}
-    {renderPagination()};
+    <Layout>
+      {renderLoading()}
+      {renderCards()}
+      {renderPagination()}; 
+    </Layout>
   </React.Fragment>;
 };
 

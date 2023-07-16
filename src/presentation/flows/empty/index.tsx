@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import React from 'react'
 import { Typography, Box } from '@mui/material';
 import { Helmet } from 'react-helmet-async'
@@ -10,7 +7,7 @@ import { Wrapper } from './styles';
 
 const EmptyPage: React.FC = () => {
 
-  const renderForm = () => {
+  const renderContent = () => {
     return (
       <Box>
         <Wrapper>
@@ -25,7 +22,7 @@ const EmptyPage: React.FC = () => {
     <Helmet>
       <title>{RoutesNameEnum.NOT_FOUND}</title>
     </Helmet>
-    {renderForm()}
+    {renderContent()}
   </React.Fragment>;
 };
 

@@ -10,13 +10,14 @@ import {
   LinearProgress,
   Pagination,
 } from '@mui/material';
+import Layout from '../../components/Layout';
 import { Table } from './components/Table'
 import { RoutesNameEnum } from '../../../routes/routePathsEnum';
 import { useCommentsService } from '../../../services/useCommentsService';
 
 const TablePage: React.FC = () => {
   const [currentPageState, setCurrentPageState] = useState(1);
-  const limit = 8;
+  const limit = 7;
   const start = (currentPageState - 1) * limit;
   const { comments, error } = useCommentsService({ start, limit});
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -140,9 +141,11 @@ const TablePage: React.FC = () => {
     <Helmet>
       <title>{RoutesNameEnum.TABLE}</title>
     </Helmet>
-    {renderLoading()}
-    {renderTable()}
-    {renderPagination()}
+    <Layout>
+      {renderLoading()}
+      {renderTable()}
+      {renderPagination()}
+    </Layout>
   </React.Fragment>;
 };
 
